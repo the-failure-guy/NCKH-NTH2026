@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+*.csv
+*.xlsx
+*.XPT
+*.xpt
+Fitabase\ Data*
+mock_dynamic_data.csv
