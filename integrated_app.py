@@ -66,28 +66,36 @@ def extract_blood_test(image_bytes):
         
     return extracted
 
+import google.generativeai as genai
+
 # ==========================================
-# HÀM CALL API OLLAMA (Local Gemma)
+# HÀM CALL API ĐÁM MÂY (Google Gemini / Gemma)
 # ==========================================
 def ask_gemma(prompt, history):
-    url = "http://localhost:11434/api/chat"
+    # Lấy API Key từ hệ thống Secrets của Streamlit Cloud
+    if "GEMINI_API_KEY" not in st.secrets:
+        return "⚠️ Lỗi: Chưa cấu hình GEMINI_API_KEY trong Streamlit Cloud Secrets."
     
-    messages = [
-        {"role": "system", "content": "Bạn là Trợ lý Bác sĩ AI của hệ thống AI Care Assistant. Hãy tư vấn sức khỏe ngắn gọn, dễ hiểu và chuyên nghiệp bằng Tiếng Việt."}
-    ]
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    
+    # Sử dụng mô hình gemini-1.5-flash siêu tốc (thông minh hơn Gemma cục bộ hàng chục lần)
+    model = genai.GenerativeModel(
+        model_name="gemini-1.5-flash",
+        system_instruction="Bạn là Trợ lý Bác sĩ AI của hệ thống AI Care Assistant. Hãy tư vấn sức khỏe ngắn gọn, dễ hiểu và chuyên nghiệp bằng Tiếng Việt."
+    )
+    
+    # Định dạng lại lịch sử chat cho Gemini
+    formatted_history = []
     for msg in history:
-        messages.append({"role": msg["role"], "content": msg["content"]})
-    messages.append({"role": "user", "content": prompt})
-    
+        role = "user" if msg["role"] == "user" else "model"
+        formatted_history.append({"role": role, "parts": [msg["content"]]})
+        
     try:
-        # Thay đổi từ "gemma" thành "gemma4" theo đúng tên model trên máy của USER
-        response = requests.post(url, json={"model": "gemma4", "messages": messages, "stream": False}, timeout=60)
-        if response.status_code == 200:
-            return response.json()['message']['content']
-        else:
-            return f"Lỗi cấu hình Ollama: {response.text}"
-    except Exception:
-        return "Không thể kết nối tới Ollama. Vui lòng mở Terminal và chạy lệnh `ollama run gemma4` để khởi động Bác sĩ AI!"
+        chat = model.start_chat(history=formatted_history)
+        response = chat.send_message(prompt)
+        return response.text
+    except Exception as e:
+        return f" Lỗi kết nối API: {str(e)}"
 
 # ==========================================
 # GIAO DIỆN CHÍNH
