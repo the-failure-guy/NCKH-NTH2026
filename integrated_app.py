@@ -85,9 +85,9 @@ def ask_gemma(prompt, history):
         formatted_history.append({"role": role, "parts": [{"text": msg["content"]}]})
         
     try:
-        # Sử dụng mô hình gemini-1.5-flash siêu tốc với SDK mới (google-genai)
+        # Sử dụng mô hình gemini-2.5-flash siêu tốc (thế hệ mới nhất)
         chat = client.chats.create(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             config={"system_instruction": "Bạn là Trợ lý Bác sĩ AI của hệ thống AI Care Assistant. Hãy tư vấn sức khỏe ngắn gọn, dễ hiểu và chuyên nghiệp bằng Tiếng Việt."},
             history=formatted_history
         )
