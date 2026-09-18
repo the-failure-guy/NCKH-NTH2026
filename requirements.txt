@@ -8,4 +8,4 @@ requests
 easyocr
 pillow
 matplotlib
-google-generativeai
+google-genai
