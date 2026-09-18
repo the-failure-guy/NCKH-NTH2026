@@ -7,3 +7,4 @@ joblib
 requests
 easyocr
 pillow
+matplotlib
