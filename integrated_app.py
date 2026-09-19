@@ -223,8 +223,8 @@ with res_col:
             prob_sdynamic = float((0.33 * s_symptom) + (0.27 * scale_hr(resting_hr)) + \
                                   (0.20 * scale_activity(activity_steps)) + (0.10 * scale_hrv(hrv)) + \
                                   (0.10 * scale_spo2(spo2)))
-            
-            r_total = 100 * (0.44 * prob_samap + 0.34 * prob_sbase + 0.22 * prob_sdynamic)
+            # ENSEMBLE RTOTAL (Trọng số mới)
+            r_total = 100 * (0.57 * prob_samap + 0.29 * prob_sbase + 0.14 * prob_sdynamic)
             
             st.header("KẾT QUẢ CHẨN ĐOÁN LÂM SÀNG TỔNG THỂ")
             
