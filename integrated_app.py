@@ -228,10 +228,7 @@ with res_col:
             
             st.header("KẾT QUẢ CHẨN ĐOÁN LÂM SÀNG TỔNG THỂ")
             
-            m1, m2, m3 = st.columns(3)
-            m1.metric("Rủi ro Huyết học (S_aMAP)", f"{prob_samap*100:.1f}%")
-            m2.metric("Rủi ro Tiền sử (S_base)", f"{prob_sbase*100:.1f}%")
-            m3.metric("Rủi ro Sinh hiệu (S_dynamic)", f"{prob_sdynamic*100:.1f}%")
+            # Đã ẩn các chỉ số thành phần theo yêu cầu (S_aMAP, S_base, S_dynamic)
             
             st.markdown("---")
             st.subheader(f"TỔNG ĐIỂM NGUY CƠ (R_total): {r_total:.1f} / 100")
