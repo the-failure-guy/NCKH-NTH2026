@@ -98,8 +98,8 @@ def predict_patient_risk(patient_dict):
     # 4. HỢP NHẤT: R_total
     # ==========================================
     # ==========================================
-    # R_total = 100 * (0.57 * S_aMAP + 0.29 * S_base + 0.14 * S_dynamic)
-    r_total = 100 * (0.57 * prob_samap + 0.29 * prob_sbase + 0.14 * prob_sdynamic)
+    # R_total = 100 * (0.44 * S_aMAP + 0.34 * S_base + 0.22 * S_dynamic)
+    r_total = 100 * (0.44 * prob_samap + 0.34 * prob_sbase + 0.22 * prob_sdynamic)
     
     # Phân tầng nguy cơ
     if r_total < 30:
