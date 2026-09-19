@@ -29,11 +29,6 @@ def load_models():
     
     return samap_artifacts, sbase_artifacts, sdynamic_artifacts
 
-@st.cache_resource
-def get_ocr_reader():
-    import easyocr
-    return easyocr.Reader(['vi', 'en'])
-
 samap_artifacts, sbase_artifacts, sdynamic_artifacts = load_models()
 
 if not all([samap_artifacts, sbase_artifacts, sdynamic_artifacts]):
@@ -50,21 +45,42 @@ if 'chat_messages' not in st.session_state: st.session_state.chat_messages = []
 # HÀM XỬ LÝ OCR
 # ==========================================
 def extract_blood_test(image_bytes):
-    reader = get_ocr_reader()
-    result = reader.readtext(image_bytes, detail=0)
-    full_text = " ".join(result).lower()
+    from google import genai
+    import json
+    import io
+    from PIL import Image
+    import streamlit as st
     
-    extracted = {}
-    alb_match = re.search(r'albumin.*?(\d+[\.,]?\d*)', full_text)
-    if alb_match: extracted['albumin'] = float(alb_match.group(1).replace(',', '.'))
+    if "GEMINI_API_KEY" not in st.secrets:
+        return {}
         
-    bili_match = re.search(r'bilirubin.*?(\d+[\.,]?\d*)', full_text)
-    if bili_match: extracted['bilirubin'] = float(bili_match.group(1).replace(',', '.'))
-        
-    plt_match = re.search(r'(?:platelet|plt|ti[eể]u c[aầ]u).*?(\d+[\.,]?\d*)', full_text)
-    if plt_match: extracted['platelets'] = float(plt_match.group(1).replace(',', '.'))
-        
-    return extracted
+    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+    img = Image.open(io.BytesIO(image_bytes))
+    
+    prompt = '''
+    Trích xuất 3 chỉ số xét nghiệm máu sau từ hình ảnh:
+    1. Albumin (g/L)
+    2. Bilirubin toàn phần (µmol/L) 
+    3. Tiểu cầu / Platelet / PLT (G/L)
+    
+    Chỉ trả về MỘT chuỗi JSON hợp lệ theo định dạng sau, không kèm bất kỳ văn bản nào khác:
+    {"albumin": 45.2, "bilirubin": 12.5, "platelets": 250.0}
+    Nếu không tìm thấy chỉ số nào, hãy bỏ qua hoặc để null.
+    '''
+    
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[img, prompt]
+        )
+        text = response.text.strip()
+        if text.startswith("```json"): text = text[7:]
+        if text.endswith("```"): text = text[:-3]
+        return json.loads(text.strip())
+    except Exception as e:
+        print("Lỗi OCR Gemini:", e)
+        return {}
+
 
 from google import genai
 
