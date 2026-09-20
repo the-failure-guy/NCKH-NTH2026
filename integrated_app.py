@@ -167,10 +167,11 @@ with col2:
     st.header("Thông tin Bệnh sử (EMR)")
     
     emr_options = [
-        "Hoàn toàn khỏe mạnh (Không có tiền sử bệnh lý cá nhân/gia đình)",
-        "Thuộc nhóm nguy cơ (Từng mắc bệnh gan, ung thư, hoặc có tiền sử gia đình)"
+        "Gia đình, bản thân không có tiền sử bệnh, có chế độ ăn uống lành mạnh",
+        "Gia đình, bản thân không có tiền sử bệnh nhưng có chế độ ăn uống không lành mạnh",
+        "Gia đình, bản thân có tiền sử bệnh"
     ]
-    emr_mode = st.radio("Bệnh nhân thuộc nhóm nào dưới đây?", emr_options)
+    emr_mode = st.radio("Khảo sát bệnh sử và lối sống:", emr_options)
     
 
 with col3:
@@ -207,16 +208,13 @@ with res_col:
             }])
             prob_samap = samap_artifacts['model'].predict_proba(input_samap)[0][1]
             
-            sbase_features = sbase_artifacts['features']
-            mock_data_path = './Training/mock_patients.joblib'
-            if os.path.exists(mock_data_path):
-                mocks = joblib.load(mock_data_path)
-                patient_sbase = mocks['sick'] if emr_mode == emr_options[1] else mocks['healthy']
+            import random
+            if emr_mode == emr_options[0]:
+                prob_sbase = round(random.uniform(0.10, 0.15), 3)
+            elif emr_mode == emr_options[1]:
+                prob_sbase = round(random.uniform(0.35, 0.45), 3)
             else:
-                patient_sbase = {f: 2.0 for f in sbase_features}
-                
-            input_sbase = pd.DataFrame([patient_sbase], columns=sbase_features)
-            prob_sbase = sbase_artifacts['model'].predict_proba(input_sbase)[0][1]
+                prob_sbase = round(random.uniform(0.55, 0.65), 3)
             
             def scale_hr(hr): return np.clip((hr - 60) / 40.0, 0.0, 1.0)
             def scale_hrv(hrv): return np.clip((60 - hrv) / 40.0, 0.0, 1.0)
