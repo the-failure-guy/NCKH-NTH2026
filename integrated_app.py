@@ -231,7 +231,7 @@ with res_col:
             # Lưu log thông tin để Chatbot AI đọc
             st.session_state.diagnostic_context = f"""
 - Tuổi: {age}, Giới tính: {'Nam' if gender==1 else 'Nữ'}
-- Albumin: {alb} g/L, Bilirubin: {bili} µmol/L, Tiểu cầu: {plt_val} G/L
+- Albumin: {albumin} g/L, Bilirubin: {bilirubin} µmol/L, Tiểu cầu: {platelets} G/L
 - Nhịp tim nghỉ: {resting_hr} bpm, HRV: {hrv} ms, SpO2: {spo2}%
 - Hoạt động: {activity_steps} bước
 - Vàng da: {'Có' if jaundice else 'Không'}, Sao mạch: {'Có' if spider_nevi else 'Không'}
