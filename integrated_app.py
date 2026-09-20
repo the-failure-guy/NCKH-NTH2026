@@ -149,9 +149,9 @@ with col1:
                 
                 st.session_state.last_uploaded_file = uploaded_file.name
                 
-    albumin = float(st.session_state.albumin_val)
-    bilirubin = float(st.session_state.bilirubin_val)
-    platelets = float(st.session_state.platelets_val)
+    albumin = float(st.session_state.albumin_val if st.session_state.albumin_val is not None else 0.0)
+    bilirubin = float(st.session_state.bilirubin_val if st.session_state.bilirubin_val is not None else 0.0)
+    platelets = float(st.session_state.platelets_val if st.session_state.platelets_val is not None else 0.0)
     
     if input_method == "Nhập thủ công" or uploaded_file is not None:
         st.markdown("**Kết quả Xét nghiệm (Có thể chỉnh sửa nếu AI quét sai):**" if input_method != "Nhập thủ công" else "**Chỉ số Xét nghiệm:**")
