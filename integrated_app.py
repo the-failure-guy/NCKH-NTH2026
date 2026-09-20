@@ -155,9 +155,19 @@ with col1:
     
     if input_method == "Nhập thủ công" or uploaded_file is not None:
         st.markdown("**Kết quả Xét nghiệm (Có thể chỉnh sửa nếu AI quét sai):**" if input_method != "Nhập thủ công" else "**Chỉ số Xét nghiệm:**")
-        albumin = st.number_input("Albumin (g/L)", min_value=1.0, max_value=100.0, value=float(st.session_state.albumin_val))
-        bilirubin = st.number_input("Bilirubin (µmol/L)", min_value=1.0, max_value=200.0, value=float(st.session_state.bilirubin_val))
-        platelets = st.number_input("Tiểu cầu (10^9/L)", min_value=10.0, max_value=1000.0, value=float(st.session_state.platelets_val))
+        
+        # Đảm bảo giá trị nằm trong khoảng hợp lệ của Streamlit input
+        safe_alb = float(st.session_state.albumin_val if st.session_state.albumin_val is not None else 35.5)
+        safe_bili = float(st.session_state.bilirubin_val if st.session_state.bilirubin_val is not None else 18.2)
+        safe_plt = float(st.session_state.platelets_val if st.session_state.platelets_val is not None else 150.0)
+        
+        safe_alb = max(1.0, min(100.0, safe_alb))
+        safe_bili = max(1.0, min(200.0, safe_bili))
+        safe_plt = max(10.0, min(1000.0, safe_plt))
+        
+        albumin = st.number_input("Albumin (g/L)", min_value=1.0, max_value=100.0, value=safe_alb)
+        bilirubin = st.number_input("Bilirubin (µmol/L)", min_value=1.0, max_value=200.0, value=safe_bili)
+        platelets = st.number_input("Tiểu cầu (10^9/L)", min_value=10.0, max_value=1000.0, value=safe_plt)
         
         st.session_state.albumin_val = albumin
         st.session_state.bilirubin_val = bilirubin
