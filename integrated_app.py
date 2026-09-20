@@ -70,7 +70,7 @@ def extract_blood_test(image_bytes):
     
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             contents=[img, prompt]
         )
         text = response.text.strip()
@@ -105,9 +105,9 @@ def ask_gemma(prompt, history):
         sys_prompt += f"\n\nTHÔNG TIN BỆNH NHÂN HIỆN TẠI (Dùng để trả lời nếu người dùng hỏi):\n{st.session_state.diagnostic_context}"
         
     try:
-        # Sử dụng mô hình gemini-2.5-flash siêu tốc (thế hệ mới nhất)
+        # Sử dụng mô hình gemini-3.6-flash siêu tốc (thế hệ mới nhất)
         chat = client.chats.create(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             config={"system_instruction": sys_prompt},
             history=formatted_history
         )
