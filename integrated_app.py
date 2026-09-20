@@ -100,11 +100,15 @@ def ask_gemma(prompt, history):
         role = "user" if msg["role"] == "user" else "model"
         formatted_history.append({"role": role, "parts": [{"text": msg["content"]}]})
         
+    sys_prompt = "Bạn là Trợ lý Bác sĩ AI của hệ thống AI Care Assistant. Hãy tư vấn sức khỏe ngắn gọn, dễ hiểu và chuyên nghiệp bằng Tiếng Việt."
+    if "diagnostic_context" in st.session_state and st.session_state.diagnostic_context:
+        sys_prompt += f"\n\nTHÔNG TIN BỆNH NHÂN HIỆN TẠI (Dùng để trả lời nếu người dùng hỏi):\n{st.session_state.diagnostic_context}"
+        
     try:
         # Sử dụng mô hình gemini-2.5-flash siêu tốc (thế hệ mới nhất)
         chat = client.chats.create(
             model="gemini-2.5-flash",
-            config={"system_instruction": "Bạn là Trợ lý Bác sĩ AI của hệ thống AI Care Assistant. Hãy tư vấn sức khỏe ngắn gọn, dễ hiểu và chuyên nghiệp bằng Tiếng Việt."},
+            config={"system_instruction": sys_prompt},
             history=formatted_history
         )
         response = chat.send_message(prompt)
@@ -225,6 +229,16 @@ with res_col:
                                   (0.10 * scale_spo2(spo2)))
             # ENSEMBLE RTOTAL (Trọng số mới)
             r_total = 100 * (0.57 * prob_samap + 0.29 * prob_sbase + 0.14 * prob_sdynamic)
+            
+            # Lưu log thông tin để Chatbot AI đọc
+            st.session_state.diagnostic_context = f"""
+- Tuổi: {age}, Giới tính: {'Nam' if gender==1 else 'Nữ'}
+- Albumin: {alb} g/L, Bilirubin: {bili} µmol/L, Tiểu cầu: {plt_val} G/L
+- Nhịp tim nghỉ: {resting_hr} bpm, HRV: {hrv} ms, SpO2: {spo2}%
+- Hoạt động: {activity_steps} bước
+- Vàng da: {'Có' if jaundice else 'Không'}, Sao mạch: {'Có' if spider_nevi else 'Không'}
+=> TỔNG ĐIỂM RỦI RO GAN (R_total): {r_total:.1f}/100.
+"""
             
             st.header("KẾT QUẢ CHẨN ĐOÁN LÂM SÀNG TỔNG THỂ")
             
